@@ -1,0 +1,78 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --gm-forest-deep: #10261c;
+  --gm-forest: #1b4332;
+  --gm-forest-mid: #2d6a4f;
+  --gm-forest-soft: #d8eadf;
+  --gm-paper: #f3eee4;
+  --gm-paper-raised: #fffaf1;
+  --gm-paper-rule: #ddd4c4;
+  --gm-ink: #1b211d;
+  --gm-ink-muted: #5c675f;
+  --gm-ink-faint: #8b928a;
+  --gm-brass: #b08a3c;
+  --gm-brass-soft: #f0e2bf;
+  --gm-danger: #9b3a2f;
+  --gm-warning: #9a6b16;
+  --gm-success: #2d6a4f;
+  --gm-focus: #1b4332;
+}
+
+html,
+body {
+  background: var(--gm-paper);
+  color: var(--gm-ink);
+  min-height: 100%;
+}
+
+body {
+  font-family: var(--font-sans), system-ui, sans-serif;
+  background-image:
+    linear-gradient(180deg, rgba(16, 38, 28, 0.04), transparent 28%),
+    repeating-linear-gradient(
+      180deg,
+      transparent,
+      transparent 27px,
+      rgba(27, 67, 50, 0.035) 28px
+    );
+}
+
+::selection {
+  background: var(--gm-forest-soft);
+}
+
+:focus-visible {
+  outline: 2px solid var(--gm-forest);
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+.gm-panel {
+  background: var(--gm-paper-raised);
+  border: 1px solid var(--gm-paper-rule);
+  border-radius: 10px;
+}
+
+.gm-rule {
+  height: 1px;
+  background: var(--gm-paper-rule);
+}
+
+input,
+select,
+textarea,
+button {
+  font: inherit;
+}
