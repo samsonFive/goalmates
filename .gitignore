@@ -1,0 +1,42 @@
+# Licensed reference materials - LOCAL ONLY
+reference-assets/taskpilot/*
+reference-assets/dason/*
+!reference-assets/taskpilot/.gitkeep
+!reference-assets/dason/.gitkeep
+
+# Environment / secrets
+.env
+.env.*
+!.env.example
+
+# Dependencies/build
+node_modules/
+.next/
+dist/
+build/
+coverage/
+.playwright/
+playwright-report/
+test-results/
+
+# Local databases/runtime
+*.db
+*.sqlite
+*.sqlite3
+data/uploads/
+prisma/dev.db
+prisma/dev.db-journal
+prisma/test.db
+prisma/test.db-journal
+
+# OS/editor
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# Local tooling / starter leftovers
+goalmates-tools/
+goalmates-starter/
+*.zip
+tsconfig.tsbuildinfo
