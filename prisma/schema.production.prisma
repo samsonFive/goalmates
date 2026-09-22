@@ -1,0 +1,314 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id            String   @id @default(cuid())
+  email         String   @unique
+  name          String
+  passwordHash  String
+  timezone      String   @default("America/Los_Angeles")
+  locale        String   @default("en-US")
+  energyDefault String?
+  isDemo        Boolean  @default(false)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  memberships         Membership[]
+  createdTasks        Task[]                 @relation("TaskCreator")
+  ownedTasks          Task[]                 @relation("TaskOwner")
+  claimedTasks        Task[]                 @relation("TaskClaimant")
+  requestedTasks      Task[]                 @relation("TaskRequester")
+  assignedTasks       Task[]                 @relation("TaskAssignee")
+  focusSessions       FocusSession[]
+  captures            Capture[]
+  activities          Activity[]
+  ritualOccurrences   RitualOccurrence[]
+  projectParticipants ProjectParticipant[]
+  taskParticipants    TaskParticipant[]
+}
+
+model Space {
+  id        String   @id @default(cuid())
+  type      String
+  name      String
+  ownerId   String
+  settings  String   @default("{}")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  memberships      Membership[]
+  projects         Project[]
+  tasks            Task[]
+  events           CalendarEvent[]
+  timeBlocks       TimeBlock[]
+  rituals          Ritual[]
+  captures         Capture[]
+  activities       Activity[]
+  focusSessions    FocusSession[]
+  goals            Goal[]
+}
+
+model Membership {
+  id        String   @id @default(cuid())
+  userId    String
+  spaceId   String
+  role      String
+  createdAt DateTime @default(now())
+
+  user  User  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  space Space @relation(fields: [spaceId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, spaceId])
+}
+
+model Goal {
+  id          String    @id @default(cuid())
+  spaceId     String
+  title       String
+  description String?
+  targetDate  DateTime?
+  createdAt   DateTime  @default(now())
+
+  space Space @relation(fields: [spaceId], references: [id], onDelete: Cascade)
+}
+
+model Project {
+  id            String    @id @default(cuid())
+  spaceId       String
+  name          String
+  outcome       String?
+  status        String    @default("active")
+  startAt       DateTime?
+  targetAt      DateTime?
+  reviewCadence String?
+  archivedAt    DateTime?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  space        Space                @relation(fields: [spaceId], references: [id], onDelete: Cascade)
+  tasks        Task[]
+  participants ProjectParticipant[]
+  blocks       WorkspaceBlock[]
+  events       CalendarEvent[]
+}
+
+model ProjectParticipant {
+  id        String @id @default(cuid())
+  projectId String
+  userId    String
+  role      String @default("member")
+
+  project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([projectId, userId])
+}
+
+model Task {
+  id                 String    @id @default(cuid())
+  spaceId            String
+  projectId          String?
+  title              String
+  description        String?
+  status             String    @default("open")
+  estimateMinutes    Int?
+  actualMinutes      Int?
+  dueAt              DateTime?
+  scheduledStart     DateTime?
+  scheduledEnd       DateTime?
+  priority           String    @default("normal")
+  importance         String    @default("normal")
+  tags               String    @default("[]")
+  context            String?
+  recurrence         String?
+  collaborationState String    @default("personal")
+  creatorId          String
+  ownerId            String?
+  claimantId         String?
+  requesterId        String?
+  assigneeId         String?
+  nudgePolicy        String    @default("inherit")
+  completedAt        DateTime?
+  archivedAt         DateTime?
+  sourceCaptureId    String?
+  createdAt          DateTime  @default(now())
+  updatedAt          DateTime  @updatedAt
+
+  space         Space             @relation(fields: [spaceId], references: [id], onDelete: Cascade)
+  project       Project?          @relation(fields: [projectId], references: [id], onDelete: SetNull)
+  creator       User              @relation("TaskCreator", fields: [creatorId], references: [id])
+  owner         User?             @relation("TaskOwner", fields: [ownerId], references: [id])
+  claimant      User?             @relation("TaskClaimant", fields: [claimantId], references: [id])
+  requester     User?             @relation("TaskRequester", fields: [requesterId], references: [id])
+  assignee      User?             @relation("TaskAssignee", fields: [assigneeId], references: [id])
+  participants  TaskParticipant[]
+  timeBlocks    TimeBlock[]
+  events        CalendarEvent[]
+  focusSessions FocusSession[]
+}
+
+model TaskParticipant {
+  id     String @id @default(cuid())
+  taskId String
+  userId String
+
+  task Task @relation(fields: [taskId], references: [id], onDelete: Cascade)
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([taskId, userId])
+}
+
+model CalendarEvent {
+  id         String   @id @default(cuid())
+  spaceId    String
+  title      String
+  startAt    DateTime
+  endAt      DateTime
+  source     String   @default("internal")
+  externalId String?
+  taskId     String?
+  projectId  String?
+  ritualId   String?
+  notes      String?
+  createdAt  DateTime @default(now())
+
+  space   Space    @relation(fields: [spaceId], references: [id], onDelete: Cascade)
+  task    Task?    @relation(fields: [taskId], references: [id], onDelete: SetNull)
+  project Project? @relation(fields: [projectId], references: [id], onDelete: SetNull)
+}
+
+model TimeBlock {
+  id        String   @id @default(cuid())
+  spaceId   String
+  taskId    String?
+  title     String?
+  startAt   DateTime
+  endAt     DateTime
+  createdAt DateTime @default(now())
+
+  space Space @relation(fields: [spaceId], references: [id], onDelete: Cascade)
+  task  Task? @relation(fields: [taskId], references: [id], onDelete: Cascade)
+}
+
+model Ritual {
+  id              String   @id @default(cuid())
+  spaceId         String
+  name            String
+  kind            String
+  cadence         String
+  prompts         String   @default("[]")
+  expectedMinutes Int?
+  nudgePolicy     String   @default("gentle")
+  active          Boolean  @default(true)
+  createdAt       DateTime @default(now())
+
+  space       Space              @relation(fields: [spaceId], references: [id], onDelete: Cascade)
+  occurrences RitualOccurrence[]
+}
+
+model RitualOccurrence {
+  id          String    @id @default(cuid())
+  ritualId    String
+  userId      String
+  scheduledAt DateTime
+  completedAt DateTime?
+  answers     String    @default("{}")
+  createdAt   DateTime  @default(now())
+
+  ritual Ritual @relation(fields: [ritualId], references: [id], onDelete: Cascade)
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model FocusSession {
+  id             String    @id @default(cuid())
+  userId         String
+  spaceId        String
+  taskId         String?
+  intention      String?
+  plannedMinutes Int
+  actualMinutes  Int?
+  startedAt      DateTime  @default(now())
+  endedAt        DateTime?
+  outcome        String?
+  notes          String?
+
+  user  User  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  space Space @relation(fields: [spaceId], references: [id], onDelete: Cascade)
+  task  Task? @relation(fields: [taskId], references: [id], onDelete: SetNull)
+}
+
+model Capture {
+  id              String    @id @default(cuid())
+  spaceId         String
+  userId          String
+  sourceType      String
+  storageKey      String?
+  mimeType        String?
+  originalName    String?
+  textInput       String?
+  status          String    @default("uploaded")
+  provider        String?
+  processingError String?
+  rawExtraction   String?
+  reconciledAt    DateTime?
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  space      Space              @relation(fields: [spaceId], references: [id], onDelete: Cascade)
+  user       User               @relation(fields: [userId], references: [id], onDelete: Cascade)
+  candidates CaptureCandidate[]
+}
+
+model CaptureCandidate {
+  id                   String    @id @default(cuid())
+  captureId            String
+  kind                 String
+  title                String
+  description          String?
+  dueAt                DateTime?
+  scheduledStart       DateTime?
+  estimateMinutes      Int?
+  confidence           Float     @default(0.5)
+  projectHint          String?
+  proposedProjectId    String?
+  proposedProjectName  String?
+  duplicateJson        String    @default("[]")
+  reconciliationStatus String    @default("pending")
+  acceptedEntityId     String?
+  acceptedEntityType   String?
+  evidence             String?
+
+  capture Capture @relation(fields: [captureId], references: [id], onDelete: Cascade)
+}
+
+model WorkspaceBlock {
+  id        String   @id @default(cuid())
+  projectId String
+  type      String
+  title     String?
+  content   String
+  sortOrder Int      @default(0)
+  createdAt DateTime @default(now())
+
+  project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+}
+
+model Activity {
+  id         String   @id @default(cuid())
+  spaceId    String
+  actorId    String
+  type       String
+  entityType String
+  entityId   String
+  payload    String   @default("{}")
+  createdAt  DateTime @default(now())
+
+  space Space @relation(fields: [spaceId], references: [id], onDelete: Cascade)
+  actor User  @relation(fields: [actorId], references: [id], onDelete: Cascade)
+}

@@ -8,7 +8,9 @@ export interface ObjectStorage {
 }
 
 function uploadRoot() {
-  return path.resolve(process.env.UPLOAD_DIR ?? "./data/uploads");
+  if (process.env.UPLOAD_DIR) return path.resolve(process.env.UPLOAD_DIR);
+  if (process.env.VERCEL) return path.join("/tmp", "goalmates-uploads");
+  return path.resolve("./data/uploads");
 }
 
 export class LocalDiskStorage implements ObjectStorage {

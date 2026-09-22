@@ -21,6 +21,18 @@ GoalMates is a Next.js application with Prisma/SQLite by default.
 - Build with `npm run build` and run `npm start`.
 - Serve over HTTPS so the PWA can install.
 
+## Shared production (Vercel)
+
+The Next.js app is connected to the `samsonFive/goalmates` Vercel project. Production needs:
+
+- `DATABASE_URL` — Postgres (Neon)
+- `AUTH_SECRET` — long random string
+- `AUTH_URL` — `https://<project>.vercel.app`
+
+Build command is `npm run vercel-build`. It generates the Postgres Prisma client, pushes schema, seeds an empty database, then builds Next.js.
+
+Claim the current dogfood Neon database (expires 2026-09-25 if unclaimed): see `PUBLIC_POSTGRES_CLAIM_URL` in the local `.env.vercel` file (gitignored).
+
 ## Public preview (GitHub Pages)
 
 GitHub Pages can only host static files. It cannot run the Next.js server, Prisma, or real multi-device auth.
