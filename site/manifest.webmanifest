@@ -1,0 +1,13 @@
+{
+  "name": "GoalMates",
+  "short_name": "GoalMates",
+  "description": "Household planning from paper to shared action.",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#f3eee4",
+  "theme_color": "#1b4332",
+  "icons": [
+    { "src": "./icon.svg", "sizes": "512x512", "type": "image/svg+xml" }
+  ]
+}

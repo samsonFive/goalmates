@@ -21,6 +21,18 @@ GoalMates is a Next.js application with Prisma/SQLite by default.
 - Build with `npm run build` and run `npm start`.
 - Serve over HTTPS so the PWA can install.
 
+## Public preview (GitHub Pages)
+
+GitHub Pages can only host static files. It cannot run the Next.js server, Prisma, or real multi-device auth.
+
+The public preview is therefore a **device-local PWA** at:
+
+**https://samsonfive.github.io/goalmates/**
+
+Open that URL on a phone, sign in with the demo accounts, and add it to the home screen. Capture, plan, tasks, focus, and rituals work in the browser; data stays on that device.
+
+The full server app remains in this repository for local use (`npm run dev`) or a later Vercel/Postgres deploy when you want the same household database on every phone.
+
 ## PWA
 
 `/manifest.webmanifest` and `/sw.js` enable install prompts on supported mobile browsers. Offline coverage is the app shell only; mutations require the network.

@@ -8,6 +8,12 @@ Mission 01 is a **family-dogfoodable installable PWA**, not a demo. See `docs/pr
 
 Next.js 15 App Router, TypeScript, Prisma/SQLite (Postgres-ready), Auth.js credentials, GoalMates-owned design tokens, Vitest, Playwright. Decision record: `docs/architecture/decisions/0001-stack-selection.md`.
 
+## Try it on a phone
+
+**https://samsonfive.github.io/goalmates/**
+
+That GitHub Pages preview is installable. It keeps data on the device. The Next.js app in this repo is the multi-user server version for local or hosted deploy.
+
 ## Local setup
 
 ```powershell
